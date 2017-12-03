@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import yaml
-import urllib
+import urllib2
 
 from commandify import commandify, main_command
 from os import path
@@ -36,11 +36,13 @@ def info(mirror, branch, arch, flavor, query ):
 
     # Workout the URL for YAML release data.
     baseurl = "https://"+mirror+"/alpine/"+branch+"/releases/"+arch
-    f = urllib.urlopen(baseurl+"/latest-releases.yaml")
-
-    # Not all branches seem to have this info available
-    if f.code == 404:
-        raise ValueError("No latest-releases.yaml for branch "+branch)
+    try:
+        f = urllib2.urlopen(baseurl+"/latest-releases.yaml")
+    except urllib2.HTTPError as e:
+        if e.code == 404:
+            raise ValueError("No latest-releases.yaml for branch " + branch)
+        else:
+            raise ValueError("Could not process, http error: " + e.code)
 
     data=yaml.safe_load(f)
     for release in data:
