@@ -1,2 +1,2 @@
 commandify==0.0.4.10
-PyYAML==3.12
+PyYAML==5.4
